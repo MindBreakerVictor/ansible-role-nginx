@@ -334,6 +334,12 @@ nginx_http_template:
     error_page: /usr/share/nginx/html
     https_redirect: false
     autoindex: false
+    access_log:
+      location: /var/log/nginx/{% server_name %}.access.log
+      setting: main
+    error_log:
+      location: /var/log/nginx/{% server_name %}.error.log
+      error_level: warn
     ssl:
       cert: ssl/default.crt
       key: ssl/default.key
@@ -344,6 +350,7 @@ nginx_http_template:
           html_file_location: /usr/share/nginx/html
           html_file_name: index.html
           autoindex: false
+          expires_value: off
           auth_basic: null
           auth_basic_file: null
       http_demo_conf: false
