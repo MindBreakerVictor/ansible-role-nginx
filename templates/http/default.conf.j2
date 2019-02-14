@@ -73,7 +73,7 @@ server {
     error_log {{ item.value.error_log.location }} {{ item.value.error_log.error_level }};
 {% endif %}
 
-{% if item.value.root_location is defined and item.value.root_localtion %}
+{% if item.value.root_location is defined and item.value.root_location %}
     root {{ item.value.root_location }};
 {% endif %}
 {% if item.value.index is defined and item.value.index %}
@@ -142,11 +142,11 @@ server {
 {% if item.value.web_server.locations[location].html_file_name is defined and item.value.web_server.locations[location].html_file_name %}
         index  {{ item.value.web_server.locations[location].html_file_name }};
 {% endif %}
-{% if item.value.web_server.locations[location].autoindex %}
+{% if item.value.web_server.locations[location].autoindex is defined and item.value.web_server.locations[location].autoindex %}
         autoindex on;
 {% endif %}
 {% if item.value.web_server.locations[location].expires_value is defined %}
-        expires {% item.value.web_server.locations[location].expires_value %};
+        expires {{ item.value.web_server.locations[location].expires_value }};
 {% endif %}
 {% if item.value.web_server.locations[location].auth_basic is defined and item.value.web_server.locations[location].auth_basic %}
         auth_basic "{{ item.value.web_server.locations[location].auth_basic }}";
@@ -156,7 +156,7 @@ server {
 {% endif %}
     }
 {% endfor %}
-{% if item.value.web_server.http_demo_conf %}
+{% if item.value.web_server.http_demo_conf is defined and item.value.web_server.http_demo_conf %}
     sub_filter_once off;
     sub_filter 'server_hostname' '$hostname';
     sub_filter 'server_address' '$server_addr:$server_port';
