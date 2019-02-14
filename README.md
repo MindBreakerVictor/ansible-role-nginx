@@ -334,11 +334,13 @@ nginx_http_template:
     error_page: /usr/share/nginx/html
     https_redirect: false
     autoindex: false
+    root_location: '/var/www/data/{{ server_name }}'
+    index: 'index.php index.htm index.html'
     access_log:
-      location: /var/log/nginx/{% server_name %}.access.log
+      location: '/var/log/nginx/{{ server_name }}.access.log'
       setting: main
     error_log:
-      location: /var/log/nginx/{% server_name %}.error.log
+      location: '/var/log/nginx/{{ server_name }}.error.log'
       error_level: warn
     ssl:
       cert: ssl/default.crt
