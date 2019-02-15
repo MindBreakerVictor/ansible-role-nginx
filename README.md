@@ -1,19 +1,23 @@
 Ansible NGINX Role
 ==================
 
-[![Ansible Galaxy](https://img.shields.io/badge/galaxy-nginxinc.nginx-5bbdbf.svg)](https://galaxy.ansible.com/nginxinc/nginx)
-[![Build Status](https://travis-ci.org/nginxinc/ansible-role-nginx.svg?branch=master)](https://travis-ci.org/nginxinc/ansible-role-nginx)
+[![Ansible Galaxy](https://img.shields.io/badge/galaxy-mindbreakervictor.nginx-informational.svg)](https://galaxy.ansible.com/mindbreakervictor/nginx)
+<!-- [![Build Status](https://travis-ci.org/nginxinc/ansible-role-nginx.svg?branch=master)](https://travis-ci.org/nginxinc/ansible-role-nginx) -->
 
 This role installs NGINX Open Source, NGINX Plus, the NGINX Amplify agent, the NGINX Controller agent, or NGINX Unit on your target host.
 
 **Note:** This role is still in active development. There may be unidentified issues and the role variables may change as development continues.
+
+**Note2:** This role is a fork of [nginxinc.nginx](https://github.com/nginxinc/ansible-role-nginx).
+
+Personal improvements will be added while also keeping up-to-date with original project.
 
 Requirements
 ------------
 
 This role was developed using Ansible 2.4.0.0. Backwards compatibility is not guaranteed.
 
-Use `ansible-galaxy install nginxinc.nginx` to install the role on your system.
+Use `ansible-galaxy install mindbreakervictor.nginx` to install the role on your system.
 
 It supports all platforms supported by [NGINX Open Source](https://nginx.org/en/linux_packages.html#mainline) and [NGINX Plus](https://www.nginx.com/products/technical-specs/):
 
@@ -621,6 +625,6 @@ License
 Author Information
 ------------------
 
-Alessandro Fael Garcia
+Original author of [nginxinc.nginx](https://github.com/nginxinc/ansible-role-nginx): Alessandro Fael Garcia, [NGINX Inc](https://www.nginx.com/)
 
-[NGINX Inc](https://www.nginx.com/)
+Fork author: Victor-Laurențiu Stănescu, [BullGuard Ltd.](https://www.bullguard.com)
