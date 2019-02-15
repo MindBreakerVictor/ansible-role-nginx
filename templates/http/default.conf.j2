@@ -73,8 +73,8 @@ server {
     error_log {{ item.value.error_log.location }} {{ item.value.error_log.error_level }};
 {% endif %}
 
-{% if item.value.root_location is defined and item.value.root_location %}
-    root {{ item.value.root_location }};
+{% if item.value.root is defined and item.value.root %}
+    root {{ item.value.root }};
 {% endif %}
 {% if item.value.index is defined and item.value.index %}
     index {{ item.value.index }};

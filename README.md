@@ -334,7 +334,7 @@ nginx_http_template:
     error_page: /usr/share/nginx/html
     https_redirect: false
     autoindex: false
-    root_location: '/var/www/data/{{ server_name }}'
+    root: '/var/www/data/{{ server_name }}'
     index: 'index.php index.htm index.html'
     access_log:
       location: '/var/log/nginx/{{ server_name }}.access.log'
