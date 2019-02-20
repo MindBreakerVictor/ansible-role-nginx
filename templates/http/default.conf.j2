@@ -137,10 +137,10 @@ server {
 {% for location in item.value.web_server.locations %}
     location {{ item.value.web_server.locations[location].location }} {
 {% if item.value.web_server.locations[location].html_file_location is defined and item.value.web_server.locations[location].html_file_location %}
-        root   {{ item.value.web_server.locations[location].html_file_location }};
+        root {{ item.value.web_server.locations[location].html_file_location }};
 {% endif %}
 {% if item.value.web_server.locations[location].html_file_name is defined and item.value.web_server.locations[location].html_file_name %}
-        index  {{ item.value.web_server.locations[location].html_file_name }};
+        index {{ item.value.web_server.locations[location].html_file_name }};
 {% endif %}
 {% if item.value.web_server.locations[location].autoindex is defined and item.value.web_server.locations[location].autoindex %}
         autoindex on;

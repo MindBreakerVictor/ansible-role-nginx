@@ -28,6 +28,16 @@
   with_dict: "{{ nginx_http_template }}"
   when: nginx_http_template_enable
 
+- name: "(Setup: All NGINX) Ensure NGINX HTTP Root Directory Exists"
+  file:
+    path: "{{ item.value.root }}"
+    state: directory
+    owner: "{{ item.value.root_owner|default('nginx') }}"
+    group: "{{ item.value.root_group|default('nginx') }}"
+    mode: "{{ item.value.root_permissions|default('u=rwx,g=rwx,o=rx') }}"
+  with_dict: "{{ nginx_http_template }}"
+  when: nginx_http_template_enable
+
 - name: "(Setup: All NGINX) Ensure NGINX Proxy Cache Directories Exists"
   file:
     path: "{{ item.1.path }}"
