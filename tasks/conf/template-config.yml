@@ -18,6 +18,7 @@
     src: "{{ nginx_main_template.template_file }}"
     dest: "{{ nginx_main_template.conf_file_location }}/{{ nginx_main_template.conf_file_name }}"
     backup: yes
+    validate: '/usr/sbin/nginx -t'
   when: nginx_main_template_enable
   notify: "(Handler: All OSs) Reload NGINX"
 
@@ -54,6 +55,7 @@
     src: "{{ item.value.template_file }}"
     dest: "{{ item.value.conf_file_location }}/{{ item.value.conf_file_name }}"
     backup: yes
+    validate: '/usr/sbin/nginx -t'
   with_dict: "{{ nginx_http_template }}"
   when: nginx_http_template_enable
   notify: "(Handler: All OSs) Reload NGINX"
