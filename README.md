@@ -355,6 +355,8 @@ nginx_http_template:
           location: /
           html_file_location: /usr/share/nginx/html
           html_file_name: index.html
+          access_log: null # If defined, should be the same as the global one described above.
+          error_log: null # If defined, should be the same as the global one described above.
           autoindex: false
           expires_value: off
           auth_basic: null
