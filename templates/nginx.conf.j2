@@ -41,6 +41,28 @@ http {
 {% if nginx_main_template.http_global_autoindex %}
     autoindex on;
 {% endif %}
+{% if nginx_main_template.default_http_server is defined %}
+    server {
+        listen {{ nginx_main_template.default_http_server.port }} default_server;
+        server_name {{ nginx_main_template.default_http_server.name }};
+        return {{ nginx_main_template.default_http_server.return_code }};
+    }
+{% endif %}
+{% if nginx_main_template.default_https_server is defined %}
+    server {
+        listen {{ nginx_main_template.default_https_server.port }} default_server;
+        server_name {{ nginx_main_template.default_https_server.name }};
+        ssl_certificate {{ nginx_main_template.default_https_server.ssl_certificate }};
+        ssl_certificate_key {{ nginx_main_template.default_https_server.ssl_certificate_key }};
+{% if nginx_main_template.default_https_server.ssl_protocols is defined %}
+        ssl_protocols {{ nginx_main_template.default_https_server.ssl_protocols }};
+{% endif %}
+{% if nginx_main_template.default_https_server.ssl_ciphers is defined %}
+        ssl_ciphers {{ nginx_main_template.default_https_server.ssl_ciphers }};
+{% endif %}
+        return {{ nginx_main_template.default_https_server.return_code }};
+    }
+{% endif %}
     include /etc/nginx/conf.d/*.conf;
 }
 {% endif %}
