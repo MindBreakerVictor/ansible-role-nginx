@@ -174,6 +174,10 @@ This role has multiple variables. The defaults for all these variables are the f
 # Default is true.
 nginx_enable: true
 
+# Start NGINX service.
+# Default is true.
+nginx_start: true
+
 # Print NGINX configuration file to terminal after executing playbook.
 nginx_debug_output: false
 
@@ -190,10 +194,10 @@ nginx_install_from: nginx_repository
 
 # Choose where to fetch the NGINX signing key from.
 # Default is the official NGINX signing key host.
-nginx_signing_key: https://nginx.org/keys/nginx_signing.key
+nginx_signing_key: http://nginx.org/keys/nginx_signing.key
 
 # Specify source repository for NGINX Open Source.
-# Only works if 'install_from' is set to 'nginx_repository'.
+# Only works if 'nginx_install_from' is set to 'nginx_repository'.
 # Defaults are the official NGINX repositories.
 nginx_repository:
   debian:
@@ -206,7 +210,7 @@ nginx_repository:
 
 # Specify which branch of NGINX Open Source you want to install.
 # Options are 'mainline' or 'stable'.
-# Only works if 'install_from' is set to 'nginx_repository'.
+# Only works if 'nginx_install_from' is set to 'nginx_repository'.
 # Default is mainline.
 nginx_branch: mainline
 
@@ -252,20 +256,12 @@ nginx_controller_api_endpoint: null
 nginx_unit_enable: false
 nginx_unit_modules: null
 
-# Enable NGINX status data.
-# Will enable 'stub_status' in NGINX Open Source and 'status' in NGINX Plus.
+# Remove previously existing NGINX configuration files.
+# Use a list of paths you wish to remove.
 # Default is false.
-nginx_status_enable: false
-nginx_status_port: 8080
-
-# Enable NGINX Plus REST API, write access to the REST API, and NGINX Plus dashboard.
-# Requires NGINX Plus.
-# Default is false.
-nginx_rest_api_enable: false
-nginx_rest_api_location: /etc/nginx/conf.d/api.conf
-nginx_rest_api_port: 8080
-nginx_rest_api_write: false
-nginx_rest_api_dashboard: false
+nginx_cleanup_config: false
+nginx_cleanup_config_path:
+  - /etc/nginx/conf.d
 
 # Enable uploading NGINX configuration files to your system.
 # Default for uploading files is false.
@@ -273,15 +269,15 @@ nginx_rest_api_dashboard: false
 # Upload the main NGINX configuration file.
 nginx_main_upload_enable: false
 nginx_main_upload_src: conf/nginx.conf
-nginx_main_upload_dest: /etc/nginx
+nginx_main_upload_dest: /etc/nginx/
 # Upload HTTP NGINX configuration files.
 nginx_http_upload_enable: false
 nginx_http_upload_src: conf/http/*.conf
-nginx_http_upload_dest: /etc/nginx/conf.d
+nginx_http_upload_dest: /etc/nginx/conf.d/
 # Upload Stream NGINX configuration files.
 nginx_stream_upload_enable: false
 nginx_stream_upload_src: conf/stream/*.conf
-nginx_stream_upload_dest: /etc/nginx/conf.d
+nginx_stream_upload_dest: /etc/nginx/conf.d/
 # Upload HTML files.
 nginx_html_upload_enable: false
 nginx_html_upload_src: www/*
@@ -321,12 +317,11 @@ nginx_main_template:
     keyval: false
   stream_enable: false
   http_global_autoindex: false
+  #auth_request_http: /auth
 
 # Enable creating dynamic templated NGINX HTTP configuration files.
 # Defaults will not produce a valid configuration. Instead they are meant to showcase
 # the options available for templating. Each key represents a new configuration file.
-# Comment out reverse_proxy or web_server depending on whether you wish to create a web server
-# or load balancer configuration file.
 nginx_http_template_enable: false
 nginx_http_template:
   default:
@@ -336,9 +331,10 @@ nginx_http_template:
     port: 8081
     server_name: localhost
     error_page: /usr/share/nginx/html
+    root: /usr/share/nginx/html
     https_redirect: false
     autoindex: false
-    root: '/var/www/data/{{ server_name }}'
+    #auth_request: /auth
     index: 'index.php index.htm index.html'
     access_log:
       location: '/var/log/nginx/{{ server_name }}.access.log'
@@ -347,8 +343,12 @@ nginx_http_template:
       location: '/var/log/nginx/{{ server_name }}.error.log'
       error_level: warn
     ssl:
-      cert: ssl/default.crt
-      key: ssl/default.key
+      cert: /etc/ssl/certs/default.crt
+      key: /etc/ssl/private/default.key
+      protocols: TLSv1 TLSv1.1 TLSv1.2
+      ciphers: HIGH:!aNULL:!MD5
+      session_cache: none
+      session_timeout: 5m
     web_server:
       locations:
         default:
@@ -361,6 +361,11 @@ nginx_http_template:
           expires_value: off
           auth_basic: null
           auth_basic_file: null
+          #auth_req: /auth
+          #returns:
+            #return302:
+              #code: 302
+              #url: https://sso.somehost.local/?url=https://$http_host$request_uri
       http_demo_conf: false
     reverse_proxy:
       proxy_cache_path:
@@ -385,7 +390,47 @@ nginx_http_template:
       locations:
         backend:
           location: /
+          proxy_connect_timeout: null
           proxy_pass: http://backend
+          #proxy_pass_request_body: off
+          proxy_set_header:
+            header_host:
+              name: Host
+              value: $host
+            header_x_real_ip:
+              name: X-Real-IP
+              value: $remote_addr
+            header_x_forwarded_for:
+              name: X-Forwarded-For
+              value: $proxy_add_x_forwarded_for
+            header_x_forwarded_proto:
+              name: X-Forwarded-Proto
+              value: $scheme
+            #header_upgrade:
+              #name: Upgrade
+              #value: $http_upgrade
+            #header_connection:
+              #name: Connection
+              #value: "Upgrade"
+            #header_random:
+              #name: RandomName
+              #value: RandomValue
+          #internal: false
+          #proxy_store: off
+          #proxy_store_acccess: user:rw
+          proxy_read_timeout: null
+          proxy_ssl:
+            cert: /etc/ssl/certs/proxy_default.crt
+            key: /etc/ssl/private/proxy_default.key
+            trusted_cert: /etc/ssl/certs/proxy_ca.crt
+            dhparam: /etc/ssl/private/dh_param.pem
+            server_name: false
+            name: server_name
+            protocols: TLSv1 TLSv1.1 TLSv1.2
+            ciphers: HIGH:!aNULL:!MD5
+            verify: false
+            verify_depth: 1
+            session_reuse: true
           proxy_cache: frontend_proxy_cache
           proxy_temp_path:
             path: /var/cache/nginx/proxy/backend/temp
@@ -398,11 +443,16 @@ nginx_http_template:
           proxy_ignore_headers:
             - Vary
             - Cache-Control
+          proxy_redirect: false
           websocket: false
           auth_basic: null
           auth_basic_file: null
+          #auth_req: /auth
+          #returns:
+            #return302:
+              #code: 302
+              #url: https://sso.somehost.local/?url=https://$http_host$request_uri
       health_check_plus: false
-    proxy_cache_enable: false
     proxy_cache:
       proxy_cache_path:
         path: /var/cache/nginx
@@ -415,7 +465,7 @@ nginx_http_template:
       upstream1:
         name: backend
         lb_method: least_conn
-        zone_name: backend
+        zone_name: backend_mem_zone
         zone_size: 64k
         sticky_cookie: false
         servers:
@@ -424,6 +474,22 @@ nginx_http_template:
             port: 8081
             weight: 1
             health_check: max_fails=1 fail_timeout=10s
+
+# Enable NGINX status data.
+# Will enable 'stub_status' in NGINX Open Source and 'status' in NGINX Plus.
+# Default is false.
+nginx_status_enable: false
+nginx_status_port: 8080
+
+# Enable NGINX Plus REST API, write access to the REST API, and NGINX Plus dashboard.
+# Requires NGINX Plus.
+# Default is false.
+nginx_rest_api_enable: false
+nginx_rest_api_src: api.conf.j2
+nginx_rest_api_location: /etc/nginx/conf.d/api.conf
+nginx_rest_api_port: 8080
+nginx_rest_api_write: false
+nginx_rest_api_dashboard: false
 
 # Enable creating dynamic templated NGINX stream configuration files.
 # Defaults will not produce a valid configuration. Instead they are meant to showcase
@@ -443,6 +509,17 @@ nginx_stream_template:
         proxy_timeout: 3s
         proxy_connect_timeout: 1s
         proxy_protocol: false
+        proxy_ssl:
+          cert: /etc/ssl/certs/proxy_default.crt
+          key: /etc/ssl/private/proxy_default.key
+          trusted_cert: /etc/ssl/certs/proxy_ca.crt
+          server_name: false
+          name: server_name
+          protocols: TLSv1 TLSv1.1 TLSv1.2
+          ciphers: HIGH:!aNULL:!MD5
+          verify: false
+          verify_depth: 1
+          session_reuse: true
         health_check_plus: false
     upstreams:
       upstream1:
