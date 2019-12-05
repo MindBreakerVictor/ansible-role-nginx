@@ -243,6 +243,11 @@ server {
 {% if item.value.web_server.locations[location].expires_value is defined %}
         expires {{ item.value.web_server.locations[location].expires_value }};
 {% endif %}
+{% if item.value.web_server.locations[location].headers is defined %}
+{% for header in item.value.web_server.locations[location].headers %}
+        add_header {{ item.value.web_server.locations[location].headers[header].header_name }} {{ item.value.web_server.locations[location].headers[header].header_value }};
+{% endfor %}
+{% endif %}
 {% if item.value.web_server.locations[location].try_files is defined %}
         try_files {{ item.value.web_server.locations[location].try_files }};
 {% endif %}
